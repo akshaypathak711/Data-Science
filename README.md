@@ -1,5 +1,4 @@
 # Data-Science
-A collection of my work during Master's in Business Analytics - Data Science track at UTD
 =========================================================================================================================================
 
 ## [Decision Trees](https://github.com/akshaypathak711/Data-Science/tree/master/Decision%20Trees): Folder contains a python notebook that is trying to solve the following problem:
@@ -15,7 +14,7 @@ A collection of my work during Master's in Business Analytics - Data Science tra
 
       Here are what the columns represent:
       • credit.policy: 1 if the customer meets the credit underwriting criteria of LendingClub.com, and 0 otherwise.
-      • purpose: The purpose of the loan (takes values "credit_card", "debt_consolidation", "educational", "major_purchase",         "small_business", and "all_other").
+      • purpose: The purpose of the loan (takes values "credit_card", "debt_consolidation", "educational", "major_purchase","small_business", and "all_other").
       • int.rate: The interest rate of the loan, as a proportion (a rate of 11% would be stored as 0.11). Borrowers judged by LendingClub.com to be more risky are assigned higher interest rates.
       • installment: The monthly installments owed by the borrower if the loan is funded.
       • log.annual.inc: The natural log of the self-reported annual income of the borrower.
