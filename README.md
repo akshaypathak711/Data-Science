@@ -1,5 +1,4 @@
 # Data-Science
-=========================================================================================================================================
 
 ## [Decision Trees](https://github.com/akshaypathak711/Data-Science/tree/master/Decision%20Trees): Folder contains a python notebook that is trying to solve the following problem:
       Lending Club connects people who need money (borrowers) with people who have money (investors).
