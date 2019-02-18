@@ -1,0 +1,158 @@
+---
+title: "Principal Component Analysis"
+fig_height: 12
+fig_width: 14
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: inline
+---
+###_**Objective:**_ The aim of this exercise is to understand PCA and learn how to extract a low dimension dataset whilst capturing maximum information from the dataset 
+
+***
+#Importing and cleaning data
+***
+
+### Importing dataset
+
+```{r}
+library(readr) ##calling library
+Universities <- read.csv("Universities.csv", stringsAsFactors = TRUE) ##command to import csv
+head(Universities) ##command to check the sample enteries of the dataset
+```
+>Using 'stringsAsFactors = True' while importing clearly identifies some of the categorical variables that are present as strings
+
+<br>
+
+
+###Identifying the datatypes of each column to determine categorical and continuous variables
+
+
+```{r}
+Table_summary<- data.frame(sapply(Universities, function(z) length(unique(z))), sapply(Universities, function(z) class(z))) ##identifying class and unique entries
+colnames(Table_summary)<-c('Unique_values','Class_of_column')
+Table_summary
+```
+
+>College_Name and State are factor datatypes and Public_1_Private_2 has only 2 values that signifies that it is a flag. Hence, these three variables are the categorical
+
+<br>
+
+###Dropping categorical variables
+
+```{r}
+Universities_continuous_dimensions<- Universities[,-which(names(Universities)  %in% c("College_Name","State","Public_1_Private_2"))]
+head(Universities_continuous_dimensions)
+
+```
+
+<br>
+
+###Dropping null enteries _(considering only complete values)_
+
+```{r}
+Universities_cleaned_continuous_dimension <- Universities_continuous_dimensions[complete.cases(Universities_continuous_dimensions),]
+head(Universities_cleaned_continuous_dimension)
+```
+<br>
+
+### Correlation plot
+
+```{r, fig.width=10, fig.height=8}
+library(corrplot)
+
+corrplot(cor(Universities_cleaned_continuous_dimension),method = "circle",type="upper")
+
+```
+> The data is correlated and it is necessary to have dimesions that are not correlated to create a good model for any analysis. PCA can be used to obatin orthogonal dimensions with zero correlation
+
+<br>
+
+***
+#Principal Component Analysis 
+***
+
+```{r}
+Universities_prcomp<- prcomp(Universities_cleaned_continuous_dimension)
+summary(Universities_prcomp)
+```
+> On performing PCA we observe that these PCA components are very high and it there is a sudden dip in the value from PCA2 to PCA3 as only the first two components explain more than 92% of the data. It might be possible because of difference of scale amongst the dimensions. We can perfrom a simple stats check to validate this hypothesis
+
+###Summary Statistics of the data 
+
+```{r}
+summary_stats_for_cleanned_data <- data.frame(mean=sapply(Universities_cleaned_continuous_dimension, mean), 
+                         sd=sapply(Universities_cleaned_continuous_dimension, sd), 
+                         min=sapply(Universities_cleaned_continuous_dimension, min), 
+                         max=sapply(Universities_cleaned_continuous_dimension, max), 
+                         median=sapply(Universities_cleaned_continuous_dimension, median), 
+                         length=sapply(Universities_cleaned_continuous_dimension, length),
+                         miss_val=sapply(Universities_cleaned_continuous_dimension, function(x) 
+                         sum((is.na(x)))))
+options(scipen = 999)
+print(summary_stats_for_cleanned_data, digits=1)
+```
+> It is clearly observed from the summary statistics of the data that the variance of some variables like num_appli_rec.d,num_appl_accepted, etc. have very high variance. PCA is basically a variance maximizing exercise and since the variance or standard deviation of these variables are so high the PCA components would be biased. This explains why PA1 and PCA2 explain 92% of the data
+
+
+
+***
+###Why do we need to normalize data before conducting PCA?
+***
+####_In cases where we have a dataset that captures various parameters and all of them are captured at a different scale e.g. calorie content is in kcal and nutrient like protein is in grams, normalization is necessary. This is beacuse these parameters will have large variances amongst themselves and since PCA is captures large variances the PCA components will be biases towards the variables with the largest variance.This can alse be overserved with the above example_
+
+
+***
+###Normalizing Data to avoid biasness
+***
+
+```{r}
+Universities_cleaned_continuous_dimension_norm <- data.frame(sapply(Universities_cleaned_continuous_dimension, function(x) scale(x)))
+head(Universities_cleaned_continuous_dimension_norm)
+```
+
+###Summary statistics of normalized data
+
+```{r}
+
+summary_stats_for_normalized_data <- data.frame(mean=sapply(Universities_cleaned_continuous_dimension_norm, mean), 
+                         sd=sapply(Universities_cleaned_continuous_dimension_norm, sd), 
+                         min=sapply(Universities_cleaned_continuous_dimension_norm, min), 
+                         max=sapply(Universities_cleaned_continuous_dimension_norm, max), 
+                         median=sapply(Universities_cleaned_continuous_dimension_norm, median), 
+                         length=sapply(Universities_cleaned_continuous_dimension_norm, length),
+                         miss_val=sapply(Universities_cleaned_continuous_dimension_norm, function(x) 
+                         sum((is.na(x)))))
+options(scipen = 999)
+print(summary_stats_for_normalized_data, digits=1)
+```
+
+>The data is now normalized. Mean ~ 0 and standard deviation = 1
+
+### Principal Component Analysis _(With normalized data)_
+```{r}
+Universities_norm_prcomp<- prcomp(Universities_cleaned_continuous_dimension_norm)
+summary(Universities_norm_prcomp)
+```
+
+
+> We observe that the PCA1 to PCA11 covers more than 95% of the data and hence we can drop the remaining components and proceed with our analysis
+
+
+***
+###Discuss what characterizes the principal components you consider key for your analysis
+***
+```{r}
+Universities_norm_prcomp$rotation
+
+```
+
+> On observing the weights of PC1 w.r.t. each parameter it is evident that no paramater have high impact on the PC1, maybe out_of_state_tuition as correlation is ~0.04. Also, the +/- sign shows that there is a varied relation of each parameter either negative or positive. Hence, we cannot assert for sure that any one parameter has impact of PC1. In a similar, we can get insights for other PC values
+
+
+***
+***
+#                                                      _Thank You_
+***
+***
